@@ -1,0 +1,21 @@
+.pipeline-bars { display: flex; flex-direction: column; gap: 12px; }
+.pipeline-row { display: grid; grid-template-columns: 120px 1fr 160px; align-items: center; gap: 12px; }
+.pipeline-label { font-size: 13px; font-weight: 500; color: var(--muted); }
+.pipeline-bar-wrap { height: 10px; background: var(--cream-dark); border-radius: 5px; overflow: hidden; }
+.pipeline-bar-fill { height: 100%; border-radius: 5px; transition: width 0.6s ease; }
+.pipeline-count { font-size: 12px; color: var(--muted); text-align: right; }
+
+/* shared filter chip for admin sub-pages */
+.filter-chip {
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 500;
+  border: 1.5px solid var(--border);
+  background: var(--white);
+  color: var(--muted);
+  cursor: pointer;
+  transition: all var(--transition);
+}
+.filter-chip:hover { border-color: var(--amber); color: var(--amber); }
+.filter-chip.active { background: var(--amber); border-color: var(--amber); color: white; }

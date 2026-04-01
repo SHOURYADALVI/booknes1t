@@ -1,0 +1,113 @@
+.book-detail-page { padding: 0 0 64px; }
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--muted);
+  font-size: 14px;
+  padding: 20px 0 8px;
+  transition: color var(--transition);
+}
+.back-link:hover { color: var(--amber); }
+
+.book-detail-grid {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 48px;
+  margin-top: 16px;
+  align-items: start;
+}
+
+.book-detail-cover img {
+  width: 100%;
+  border-radius: var(--radius-lg);
+  box-shadow: 0 12px 40px var(--shadow-lg);
+}
+
+.book-formats {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+}
+
+.book-detail-info { display: flex; flex-direction: column; gap: 12px; }
+
+.book-detail-title {
+  font-family: var(--font-display);
+  font-size: 36px;
+  font-weight: 900;
+  line-height: 1.15;
+  color: var(--ink);
+  margin-top: 8px;
+}
+
+.book-detail-author { font-size: 16px; color: var(--muted); }
+.book-detail-genre { font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--sage); }
+
+.book-detail-rating {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.rating-num { font-weight: 700; font-size: 15px; margin-left: 4px; }
+.rating-reviews { font-size: 13px; color: var(--muted); }
+
+.book-detail-desc {
+  font-size: 15px;
+  color: var(--muted);
+  line-height: 1.75;
+  max-width: 560px;
+  padding: 16px;
+  background: var(--cream-dark);
+  border-left: 3px solid var(--amber);
+  border-radius: 0 var(--radius) var(--radius) 0;
+}
+
+.book-detail-price-block {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 4px;
+}
+.detail-price { font-family: var(--font-display); font-size: 36px; font-weight: 700; color: var(--ink); }
+.detail-mrp { font-size: 18px; color: var(--muted); text-decoration: line-through; }
+
+.book-detail-stock { font-size: 14px; font-weight: 500; }
+.in-stock { color: var(--success); }
+.low-stock { color: var(--amber); }
+.out-of-stock { color: var(--error); }
+
+.book-detail-actions { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 4px; }
+.in-cart { background: var(--sage) !important; }
+
+.book-detail-perks { display: flex; flex-direction: column; gap: 6px; padding-top: 8px; border-top: 1px solid var(--border); }
+.perk { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--muted); }
+.perk svg { color: var(--sage); }
+
+/* Related */
+.related-section { margin-top: 56px; }
+.related-section h3 { font-family: var(--font-display); font-size: 22px; margin-bottom: 20px; }
+.related-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.related-card {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  padding: 16px;
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  transition: all var(--transition);
+}
+.related-card:hover { border-color: var(--amber); transform: translateY(-2px); }
+.related-card img { width: 56px; height: 80px; object-fit: cover; border-radius: var(--radius); }
+.related-title { font-weight: 600; font-size: 13px; line-height: 1.4; }
+.related-author { font-size: 11px; color: var(--muted); margin-top: 3px; }
+.related-price { font-weight: 700; font-size: 14px; color: var(--amber); margin-top: 6px; }
+
+@media (max-width: 768px) {
+  .book-detail-grid { grid-template-columns: 1fr; }
+  .book-detail-cover { max-width: 240px; margin: 0 auto; }
+  .related-grid { grid-template-columns: 1fr; }
+}

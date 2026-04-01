@@ -1,0 +1,30 @@
+.admin-page { padding-bottom: 64px; }
+
+.admin-tabs {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 6px;
+  margin-bottom: 28px;
+}
+
+.admin-tab {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 9px 18px;
+  border-radius: var(--radius);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--muted);
+  background: none;
+  transition: all var(--transition);
+  white-space: nowrap;
+}
+.admin-tab:hover { background: var(--cream-dark); color: var(--ink); }
+.admin-tab.active { background: var(--ink); color: var(--cream); }
+
+.admin-content { min-height: 400px; }

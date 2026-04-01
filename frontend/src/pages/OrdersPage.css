@@ -1,0 +1,85 @@
+.orders-page { padding-bottom: 64px; }
+
+.orders-filter {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 24px;
+}
+
+.chip-count {
+  background: rgba(255,255,255,0.4);
+  padding: 1px 6px;
+  border-radius: 10px;
+  font-size: 10px;
+}
+.filter-chip.active .chip-count { background: rgba(255,255,255,0.3); }
+
+.orders-list { display: flex; flex-direction: column; gap: 10px; }
+
+.order-card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  transition: border-color var(--transition);
+}
+.order-card.open { border-color: var(--amber); }
+
+.order-header {
+  display: grid;
+  grid-template-columns: 1.5fr 1.5fr 1fr 100px 40px;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 20px;
+  cursor: pointer;
+  transition: background var(--transition);
+}
+.order-header:hover { background: var(--cream); }
+
+.order-id { font-weight: 700; font-size: 14px; color: var(--ink); font-family: monospace; }
+.order-date { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+.cust-name { font-weight: 600; font-size: 14px; }
+.cust-email { font-size: 12px; color: var(--muted); }
+
+.order-status-badge { display: inline-flex; align-items: center; gap: 5px; }
+
+.order-total { font-family: var(--font-display); font-size: 18px; font-weight: 700; text-align: right; }
+
+.expand-btn {
+  background: none;
+  color: var(--muted);
+  width: 32px; height: 32px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: var(--radius);
+}
+.expand-btn:hover { background: var(--cream-dark); }
+
+.order-detail {
+  border-top: 1px solid var(--border);
+  padding: 16px 20px;
+  background: var(--cream);
+  animation: fadeIn 0.2s ease;
+}
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+.order-detail-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+.pay-id { font-size: 12px; color: var(--muted); }
+.pay-id code { background: var(--cream-dark); padding: 2px 6px; border-radius: 3px; font-size: 11px; }
+.no-pay { font-size: 12px; color: var(--error); }
+.order-grand-total { font-size: 15px; color: var(--ink); }
+.order-grand-total strong { font-family: var(--font-display); font-size: 18px; }
+
+@media (max-width: 768px) {
+  .order-header { grid-template-columns: 1fr 1fr; grid-template-rows: auto auto; }
+  .order-total { text-align: left; }
+  .expand-btn { grid-column: 2; justify-self: end; }
+}

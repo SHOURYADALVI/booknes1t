@@ -1,0 +1,121 @@
+.navbar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(250, 246, 239, 0.96);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+}
+
+.navbar-inner {
+  display: flex;
+  align-items: center;
+  height: 64px;
+  gap: 32px;
+}
+
+.navbar-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--ink);
+  flex-shrink: 0;
+}
+.navbar-logo em {
+  font-style: italic;
+  color: var(--amber);
+}
+.navbar-logo svg { color: var(--amber); }
+
+.navbar-links {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex: 1;
+}
+
+.nav-link {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 14px;
+  border-radius: var(--radius);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--muted);
+  transition: all var(--transition);
+}
+.nav-link:hover { color: var(--ink); background: var(--cream-dark); }
+.nav-link.active { color: var(--amber); background: #fef3cd; font-weight: 600; }
+
+.navbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-left: auto;
+}
+
+.cart-btn {
+  position: relative;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius);
+  color: var(--ink);
+  transition: var(--transition);
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+.cart-btn:hover { background: var(--cream-dark); }
+.cart-badge {
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  width: 18px;
+  height: 18px;
+  background: var(--amber);
+  color: white;
+  border-radius: 50%;
+  font-size: 10px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.menu-toggle {
+  display: none;
+  width: 40px;
+  height: 40px;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius);
+  background: none;
+  color: var(--ink);
+}
+.menu-toggle:hover { background: var(--cream-dark); }
+
+@media (max-width: 768px) {
+  .menu-toggle { display: flex; }
+  .navbar-links {
+    display: none;
+    position: absolute;
+    top: 64px;
+    left: 0;
+    right: 0;
+    background: var(--cream);
+    flex-direction: column;
+    padding: 12px;
+    border-bottom: 1px solid var(--border);
+    gap: 4px;
+    box-shadow: 0 8px 24px var(--shadow);
+  }
+  .navbar-links.open { display: flex; }
+  .nav-link { width: 100%; }
+}
