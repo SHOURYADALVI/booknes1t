@@ -1,0 +1,149 @@
+.points-history {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  border: 1px solid #f0f0f0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.points-history.empty {
+  text-align: center;
+  padding: 40px 20px;
+  color: #999;
+}
+
+.points-history.empty p {
+  margin: 0;
+  font-size: 14px;
+}
+
+.history-title {
+  margin: 0 0 16px 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+}
+
+.transactions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.transaction-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border-bottom: 1px solid #f5f5f5;
+  transition: background 0.2s;
+}
+
+.transaction-item:last-child {
+  border-bottom: none;
+}
+
+.transaction-item:hover {
+  background: #fafafa;
+}
+
+.transaction-item.earned .transaction-icon {
+  background: #efe;
+  color: #3c3;
+}
+
+.transaction-item.redeemed .transaction-icon {
+  background: #eef;
+  color: #33c;
+}
+
+.transaction-icon {
+  min-width: 36px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+}
+
+.transaction-details {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.transaction-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #333;
+}
+
+.transaction-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  color: #999;
+}
+
+.transaction-meta svg {
+  min-width: 12px;
+}
+
+.order-ref {
+  background: #f5f5f5;
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-family: monospace;
+  font-size: 10px;
+}
+
+.transaction-amount {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.transaction-amount.earned {
+  color: #3c3;
+}
+
+.transaction-amount.redeemed {
+  color: #33c;
+}
+
+.transaction-amount .symbol {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.transaction-amount .value {
+  font-size: 13px;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .points-history {
+    padding: 16px;
+  }
+
+  .transaction-item {
+    padding: 10px;
+    gap: 10px;
+  }
+
+  .transaction-meta {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+  }
+
+  .transaction-amount {
+    font-size: 13px;
+  }
+}

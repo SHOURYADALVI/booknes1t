@@ -1,28 +1,64 @@
 import { useCart } from "../context/CartContext";
+import { useAuth } from "../context/AuthContext";
+import { useOrders } from "../hooks/useOrders";
 import { useToast } from "../hooks/useToast";
+import { usePoints } from "../hooks/usePoints";
 import Toast from "../components/Toast";
+import PointsRedemption from "../components/PointsRedemption";
 import { Trash2, Plus, Minus, ShoppingBag, ArrowRight, Shield } from "lucide-react";
 import { Link } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "./CartPage.css";
 
 export default function CartPage() {
-  const { items, total, removeItem, updateQty, clearCart, addOrder } = useCart();
+  const { items, total, removeItem, updateQty, clearCart } = useCart();
+  const { user } = useAuth();
+  const { createOrder: createRemoteOrder } = useOrders();
   const { toast, showToast } = useToast();
+  const { balance, pointsConfig, redeemPoints, fetchPointsBalance } = usePoints();
+  
   const [paying, setPaying] = useState(false);
   const [customerName, setCustomerName] = useState("");
   const [customerEmail, setCustomerEmail] = useState("");
   const [customerPhone, setCustomerPhone] = useState("");
   const [formError, setFormError] = useState("");
+  const [showPointsRedemption, setShowPointsRedemption] = useState(false);
+  const [appliedDiscount, setAppliedDiscount] = useState(0);
+  const [redeemedPoints, setRedeemedPoints] = useState(0);
+
+  // Fetch points balance when component loads or user changes
+  useEffect(() => {
+    if (user) {
+      fetchPointsBalance();
+    }
+  }, [user, fetchPointsBalance]);
 
   const shipping = total >= 499 ? 0 : 49;
-  const grandTotal = total + shipping;
+  const grandTotal = Math.max(0, total + shipping - appliedDiscount);
 
   const validateForm = () => {
     if (!customerName.trim()) return "Please enter your name";
     if (!customerEmail.trim() || !customerEmail.includes("@")) return "Please enter a valid email";
     if (!customerPhone.trim() || customerPhone.length < 10) return "Please enter a valid 10-digit phone number";
     return null;
+  };
+
+  const handleApplyPoints = async (pointsToUse, discountAmount) => {
+    try {
+      await redeemPoints(pointsToUse);
+      setAppliedDiscount(discountAmount);
+      setRedeemedPoints(pointsToUse);
+      setShowPointsRedemption(false);
+      showToast(`✅ Applied ₹${discountAmount.toFixed(2)} discount using ${pointsToUse} points!`);
+    } catch (err) {
+      showToast(err.message || "Failed to apply points", "error");
+    }
+  };
+
+  const handleRemoveDiscount = () => {
+    setAppliedDiscount(0);
+    setRedeemedPoints(0);
+    showToast("Discount removed. You can apply points again.", "info");
   };
 
   const handlePayment = async () => {
@@ -32,7 +68,15 @@ export default function CartPage() {
     setPaying(true);
 
     try {
-      // 1. Create Razorpay order via our API
+      // 1. Prepare order items
+      const orderItems = items.map(i => ({
+        id: i.id,
+        title: i.title,
+        price: i.price,
+        qty: i.qty,
+      }));
+
+      // 2. Create Razorpay order
       const res = await fetch("/api/create-order", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -40,21 +84,23 @@ export default function CartPage() {
       });
       const orderData = await res.json();
 
-      if (!res.ok) throw new Error(orderData.error || "Order creation failed");
+      if (!res.ok) {
+        throw new Error(orderData.error || "Failed to create Razorpay order");
+      }
 
-      // 2. Open Razorpay checkout
+      // 3. Open Razorpay checkout
       const options = {
         key: import.meta.env.VITE_RAZORPAY_KEY_ID,
         amount: orderData.amount,
         currency: orderData.currency,
         name: "BookNest",
-        description: `${items.length} book(s) — Order ${orderData.receipt}`,
+        description: `${orderItems.length} book(s)`,
         order_id: orderData.orderId,
         prefill: { name: customerName, email: customerEmail, contact: customerPhone },
         theme: { color: "#c8860a" },
         handler: async (response) => {
           try {
-            // 3. Verify payment
+            // Verify payment
             const verifyRes = await fetch("/api/verify-payment", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
@@ -67,39 +113,41 @@ export default function CartPage() {
             const verifyData = await verifyRes.json();
 
             if (verifyData.success) {
-              // 4. Add order to local state
-              const newOrder = {
-                id: `ORD-${Date.now()}`,
-                customer: customerName,
-                email: customerEmail,
-                date: new Date().toISOString().split("T")[0],
-                status: "Processing",
-                items: items.map(i => ({ title: i.title, qty: i.qty, price: i.price })),
-                total: grandTotal,
-                paymentId: response.razorpay_payment_id,
-                city: "Online",
-              };
-              addOrder(newOrder);
-              clearCart();
-              showToast(`Payment successful! Order ${newOrder.id} confirmed.`);
+              // Payment verified - NOW create the order
+              const savedOrder = await createRemoteOrder(
+                orderItems,
+                grandTotal,
+                response.razorpay_payment_id
+              );
+
+              if (savedOrder) {
+                clearCart();
+                showToast(`✅ Payment successful! Order ${savedOrder.id} created. Check "My Orders".`);
+              } else {
+                throw new Error("Failed to create order after payment");
+              }
             } else {
-              showToast("Payment verification failed. Please contact support.", "error");
+              throw new Error("Payment verification failed");
             }
-          } catch {
-            showToast("Verification error. Please contact support.", "error");
+          } catch (err) {
+            console.error("Payment verification error:", err);
+            showToast("Payment verification failed. Please try again.", "error");
           } finally {
             setPaying(false);
           }
         },
         modal: {
-          ondismiss: () => { setPaying(false); showToast("Payment cancelled", "error"); }
+          ondismiss: () => { 
+            setPaying(false);
+            showToast("Payment cancelled. Order not created.", "info");
+          }
         },
       };
 
       const rzp = new window.Razorpay(options);
       rzp.open();
     } catch (err) {
-      showToast(err.message || "Payment failed. Try again.", "error");
+      showToast(err.message || "Payment setup failed. Try again.", "error");
       setPaying(false);
     }
   };
@@ -165,10 +213,48 @@ export default function CartPage() {
                   <div className="summary-line"><span>Subtotal ({items.reduce((s, i) => s + i.qty, 0)} items)</span><span>₹{total.toLocaleString()}</span></div>
                   <div className="summary-line"><span>Delivery</span><span className={shipping === 0 ? "free-text" : ""}>{shipping === 0 ? "FREE" : `₹${shipping}`}</span></div>
                   {shipping === 0 && <div className="free-delivery-note">🎉 You qualify for free delivery!</div>}
+                  {appliedDiscount > 0 && (
+                    <div className="summary-line discount">
+                      <span>Points Discount</span>
+                      <span className="discount-amount">-₹{appliedDiscount.toFixed(2)}</span>
+                    </div>
+                  )}
                   <div className="summary-line summary-total"><span>Total</span><span>₹{grandTotal.toLocaleString()}</span></div>
                 </div>
 
-                {/* Customer Details */}
+                {/* Points Redemption Section */}
+                {!appliedDiscount && balance > 0 && (
+                  <div className="points-section">
+                    <button 
+                      className="btn-toggle-points"
+                      onClick={() => setShowPointsRedemption(!showPointsRedemption)}
+                    >
+                      {showPointsRedemption ? "Hide Points" : `💎 Use ${balance} Points (Worth ₹${((balance || 0) * 0.5).toFixed(2)})`}
+                    </button>
+                  </div>
+                )}
+
+                {appliedDiscount > 0 && (
+                  <div className="applied-discount-banner">
+                    <div className="discount-info">
+                      <span className="check-mark">✓</span>
+                      <div>
+                        <div className="discount-label">Points Applied!</div>
+                        <div className="discount-detail">{redeemedPoints} points redeemed for ₹{appliedDiscount.toFixed(2)} discount</div>
+                      </div>
+                    </div>
+                    <button className="remove-discount" onClick={handleRemoveDiscount}>Remove</button>
+                  </div>
+                )}
+
+                {showPointsRedemption && !appliedDiscount && (
+                  <PointsRedemption
+                    availablePoints={balance || 0}
+                    pointsConfig={pointsConfig}
+                    onRedeem={handleApplyPoints}
+                    onCancel={() => setShowPointsRedemption(false)}
+                  />
+                )}
                 <div className="customer-form">
                   <h4>Delivery Details</h4>
                   <div className="form-group">

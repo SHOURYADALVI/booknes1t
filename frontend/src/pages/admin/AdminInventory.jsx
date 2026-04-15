@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { BOOKS } from "../../data/mockData";
-import { useToast } from "../../hooks/useToast";
-import Toast from "../../components/Toast";
+import { BOOKS } from "../../data/mockData.js";
+import { useToast } from "../../hooks/useToast.js";
+import Toast from "../../components/Toast.jsx";
 import { AlertTriangle, Package } from "lucide-react";
 
 export default function AdminInventory() {

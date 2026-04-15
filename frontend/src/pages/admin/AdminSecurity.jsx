@@ -1,4 +1,4 @@
-import { THREATS } from "../../data/mockData";
+import { THREATS } from "../../data/mockData.js";
 import { ShieldCheck, AlertTriangle, CheckCircle, Eye } from "lucide-react";
 
 const LIKELIHOOD_COLOR = { High: "badge-red", Medium: "badge-amber", Low: "badge-green" };

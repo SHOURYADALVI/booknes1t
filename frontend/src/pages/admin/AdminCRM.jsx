@@ -1,87 +1,245 @@
-import { CUSTOMERS } from "../../data/mockData";
+import { useAnalytics } from "../../hooks/useAnalytics.js";
+import AnalyticsReports from "../../components/AnalyticsReports.jsx";
+import BusinessHealthInsights from "../../components/BusinessHealthInsights.jsx";
+import AdminCRMInsights from "./AdminCRMInsights.jsx";
+import { TrendingUp, Package, Users, DollarSign, RefreshCw, Lightbulb } from "lucide-react";
 import { useState } from "react";
-import { Users, Mail, TrendingUp } from "lucide-react";
 
-const SEG_COLORS = { VIP: "badge-amber", Regular: "badge-blue", New: "badge-green" };
+const STATUS_COLORS = {
+  Processing: "badge-amber",
+  Shipped: "badge-blue",
+  Delivered: "badge-green",
+  Cancelled: "badge-red",
+};
 
 export default function AdminCRM() {
-  const [filter, setFilter] = useState("All");
-  const segments = ["All", "VIP", "Regular", "New"];
+  const { analytics, advancedAnalytics, loading, fetchAnalytics } = useAnalytics();
+  const [activeTab, setActiveTab] = useState("overview");
 
-  const filtered = filter === "All" ? CUSTOMERS : CUSTOMERS.filter(c => c.segment === filter);
-  const totalLTV = CUSTOMERS.reduce((s, c) => s + c.ltv, 0);
-  const avgLTV = Math.round(totalLTV / CUSTOMERS.length);
-  const subscribed = CUSTOMERS.filter(c => c.subscribed).length;
+  if (loading && !analytics) {
+    return (
+      <div style={{ padding: 20, textAlign: "center", color: "var(--muted)" }}>
+        Loading analytics...
+      </div>
+    );
+  }
+
+  if (!analytics) {
+    return (
+      <div style={{ padding: 20, textAlign: "center", color: "var(--muted)" }}>
+        Unable to load analytics data
+      </div>
+    );
+  }
+
+  const {
+    totalOrders,
+    totalRevenue,
+    avgOrderValue,
+    uniqueCustomers,
+    ordersByStatus,
+    revenueByStatus,
+    topProducts,
+    ordersTimeline,
+  } = analytics;
 
   return (
     <div>
-      {/* Stats */}
-      <div className="grid-4" style={{ marginBottom: 24 }}>
-        <div className="stat-card"><div className="stat-label">Total Customers</div><div className="stat-value">{CUSTOMERS.length}</div></div>
-        <div className="stat-card"><div className="stat-label">Total Lifetime Value</div><div className="stat-value">₹{totalLTV.toLocaleString()}</div></div>
-        <div className="stat-card"><div className="stat-label">Avg Customer LTV</div><div className="stat-value">₹{avgLTV.toLocaleString()}</div></div>
-        <div className="stat-card"><div className="stat-label">Newsletter Subscribed</div><div className="stat-value">{subscribed}/{CUSTOMERS.length}</div><div className="stat-delta">{Math.round(subscribed/CUSTOMERS.length*100)}% opt-in rate</div></div>
-      </div>
-
-      {/* Segment breakdown */}
-      <div className="card" style={{ marginBottom: 20 }}>
-        <h3 style={{ fontFamily: "var(--font-display)", marginBottom: 16, fontSize: 18 }}>Customer Segmentation (RFM Model)</h3>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16 }}>
-          {["VIP", "Regular", "New"].map(seg => {
-            const group = CUSTOMERS.filter(c => c.segment === seg);
-            const segLTV = group.reduce((s, c) => s + c.ltv, 0);
-            const descs = { VIP: "High frequency, high spend. Priority retention.", Regular: "Moderate engagement. Upsell candidates.", New: "Recently acquired. Focus on first repeat purchase." };
-            return (
-              <div key={seg} style={{ padding: 16, background: "var(--cream)", borderRadius: "var(--radius)", border: "1px solid var(--border)" }}>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
-                  <span className={`badge ${SEG_COLORS[seg]}`}>{seg}</span>
-                  <span style={{ fontFamily: "var(--font-display)", fontSize: 22, fontWeight: 700 }}>{group.length}</span>
-                </div>
-                <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 4 }}>₹{segLTV.toLocaleString()} total LTV</div>
-                <div style={{ fontSize: 11, color: "var(--muted)", lineHeight: 1.5 }}>{descs[seg]}</div>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* Filter + Table */}
-      <div style={{ display: "flex", gap: 8, marginBottom: 16, flexWrap: "wrap" }}>
-        {segments.map(s => (
-          <button key={s} className={`filter-chip ${filter === s ? "active" : ""}`} onClick={() => setFilter(s)}>{s}</button>
+      {/* Tabs */}
+      <div style={{ display: "flex", gap: 8, marginBottom: 20, borderBottom: "1px solid var(--border)", paddingBottom: 12, overflowX: "auto" }}>
+        {["overview", "products", "timeline", "actionable", "insights", "reports"].map(tab => (
+          <button
+            key={tab}
+            onClick={() => setActiveTab(tab)}
+            style={{
+              padding: "8px 16px",
+              borderBottom: activeTab === tab ? "2px solid var(--ink)" : "none",
+              background: "none",
+              border: "none",
+              cursor: "pointer",
+              fontSize: 14,
+              fontWeight: activeTab === tab ? 600 : 400,
+              color: activeTab === tab ? "var(--ink)" : "var(--muted)",
+              textTransform: "capitalize",
+              whiteSpace: "nowrap",
+            }}
+          >
+            {tab === "actionable" ? <><Lightbulb size={14} style={{ marginRight: 6, display: "inline" }} />Actionable Insights</> : tab}
+          </button>
         ))}
+        <button
+          onClick={fetchAnalytics}
+          style={{
+            marginLeft: "auto",
+            padding: "8px 12px",
+            background: "var(--cream)",
+            border: "1px solid var(--border)",
+            borderRadius: "var(--radius)",
+            cursor: "pointer",
+            display: "flex",
+            alignItems: "center",
+            gap: 6,
+            fontSize: 12,
+          }}
+        >
+          <RefreshCw size={14} style={{ animation: loading ? "spin 1s linear infinite" : "none" }} />
+          Refresh
+        </button>
       </div>
 
-      <div className="card" style={{ padding: 0 }}>
-        <div className="table-wrap">
-          <table>
-            <thead>
-              <tr><th>Customer</th><th>City</th><th>Orders</th><th>Lifetime Value</th><th>Segment</th><th>Newsletter</th><th>Member Since</th></tr>
-            </thead>
-            <tbody>
-              {filtered.map(c => (
-                <tr key={c.id}>
-                  <td>
-                    <div style={{ fontWeight: 600, fontSize: 13 }}>{c.name}</div>
-                    <div style={{ fontSize: 11, color: "var(--muted)" }}>{c.email}</div>
-                  </td>
-                  <td style={{ fontSize: 13 }}>{c.city}</td>
-                  <td style={{ fontWeight: 700 }}>{c.orders}</td>
-                  <td style={{ fontFamily: "var(--font-display)", fontWeight: 700, color: c.ltv > 5000 ? "var(--amber)" : "var(--ink)" }}>₹{c.ltv.toLocaleString()}</td>
-                  <td><span className={`badge ${SEG_COLORS[c.segment]}`}>{c.segment}</span></td>
-                  <td>
-                    {c.subscribed
-                      ? <span className="badge badge-green">✓ Subscribed</span>
-                      : <span className="badge badge-gray">Unsubscribed</span>
-                    }
-                  </td>
-                  <td style={{ fontSize: 12, color: "var(--muted)" }}>{new Date(c.joinDate).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+      {activeTab === "overview" && (
+        <>
+          {/* Key Metrics */}
+          <div className="grid-4" style={{ marginBottom: 24 }}>
+            <div className="stat-card">
+              <div className="stat-label">Total Orders</div>
+              <div className="stat-value">{totalOrders}</div>
+            </div>
+            <div className="stat-card">
+              <div className="stat-label">Total Revenue</div>
+              <div className="stat-value">₹{totalRevenue.toLocaleString()}</div>
+            </div>
+            <div className="stat-card">
+              <div className="stat-label">Average Order Value</div>
+              <div className="stat-value">₹{avgOrderValue.toLocaleString()}</div>
+            </div>
+            <div className="stat-card">
+              <div className="stat-label">Unique Customers</div>
+              <div className="stat-value">{uniqueCustomers}</div>
+            </div>
+          </div>
+
+          {/* Order Status Breakdown */}
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 20, marginBottom: 24 }}>
+            <div className="card">
+              <h3 style={{ fontFamily: "var(--font-display)", marginBottom: 16, fontSize: 16 }}>Orders by Status</h3>
+              <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                {Object.entries(ordersByStatus).map(([status, count]) => (
+                  <div key={status} style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontSize: 13, fontWeight: 500, marginBottom: 4 }}>{status}</div>
+                      <div style={{ height: 8, background: "var(--cream)", borderRadius: 4, overflow: "hidden" }}>
+                        <div
+                          style={{
+                            height: "100%",
+                            background: {
+                              Processing: "#f59e0b",
+                              Shipped: "#3b82f6",
+                              Delivered: "#10b981",
+                              Cancelled: "#ef4444",
+                            }[status],
+                            width: `${totalOrders > 0 ? (count / totalOrders) * 100 : 0}%`,
+                          }}
+                        />
+                      </div>
+                    </div>
+                    <div style={{ fontSize: 14, fontWeight: 700, minWidth: 40 }}>{count}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="card">
+              <h3 style={{ fontFamily: "var(--font-display)", marginBottom: 16, fontSize: 16 }}>Revenue by Status</h3>
+              <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                {Object.entries(revenueByStatus).map(([status, revenue]) => (
+                  <div key={status} style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <span className={`badge ${STATUS_COLORS[status]}`}>{status}</span>
+                    <span style={{ fontFamily: "var(--font-display)", fontWeight: 700 }}>
+                      ₹{revenue.toLocaleString()}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </>
+      )}
+
+      {activeTab === "products" && (
+        <div className="card">
+          <h3 style={{ fontFamily: "var(--font-display)", marginBottom: 16, fontSize: 16 }}>Top Selling Products</h3>
+          <div style={{ padding: 0 }}>
+            <div className="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Product</th>
+                    <th>Quantity Sold</th>
+                    <th>Revenue</th>
+                    <th>Avg per Unit</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {topProducts.map((product, idx) => (
+                    <tr key={idx}>
+                      <td>
+                        <div style={{ fontWeight: 600, fontSize: 13 }}>{product.title}</div>
+                      </td>
+                      <td style={{ fontSize: 13, fontWeight: 700 }}>{product.quantity} units</td>
+                      <td style={{ fontFamily: "var(--font-display)", fontWeight: 700, color: "var(--green)" }}>
+                        ₹{product.revenue.toLocaleString()}
+                      </td>
+                      <td style={{ fontSize: 13, color: "var(--muted)" }}>
+                        ₹{(product.revenue / product.quantity).toFixed(0)}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
         </div>
-      </div>
+      )}
+
+      {activeTab === "timeline" && (
+        <div className="card">
+          <h3 style={{ fontFamily: "var(--font-display)", marginBottom: 16, fontSize: 16 }}>Orders Over Last 7 Days</h3>
+          <div style={{ display: "flex", alignItems: "flex-end", gap: 8, height: 150, paddingBottom: 8 }}>
+            {Object.entries(ordersTimeline).map(([date, count]) => {
+              const maxCount = Math.max(...Object.values(ordersTimeline));
+              const height = maxCount > 0 ? (count / maxCount) * 100 : 0;
+              return (
+                <div key={date} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
+                  <div
+                    style={{
+                      width: "100%",
+                      height: `${height}%`,
+                      background: "var(--amber)",
+                      borderRadius: "4px 4px 0 0",
+                      minHeight: 20,
+                    }}
+                    title={`${count} orders`}
+                  />
+                  <div style={{ fontSize: 11, color: "var(--muted)", textAlign: "center", width: "100%" }}>
+                    {new Date(date).toLocaleDateString("en-IN", { day: "numeric", month: "short" })}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {activeTab === "insights" && (
+        <BusinessHealthInsights
+          businessHealth={advancedAnalytics?.businessHealth}
+          actionableInsights={advancedAnalytics?.actionableInsights}
+        />
+      )}
+
+      {activeTab === "actionable" && (
+        <AdminCRMInsights
+          analytics={analytics}
+          advancedAnalytics={advancedAnalytics}
+        />
+      )}
+
+      {activeTab === "reports" && (
+        <div className="card">
+          <AnalyticsReports advancedAnalytics={advancedAnalytics} />
+        </div>
+      )}
     </div>
   );
 }

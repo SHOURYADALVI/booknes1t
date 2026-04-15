@@ -83,3 +83,37 @@
   .order-total { text-align: left; }
   .expand-btn { grid-column: 2; justify-self: end; }
 }
+
+/* Review Button Styles */
+.btn-review {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: linear-gradient(135deg, #e8a335 0%, #d2691e 100%);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.btn-review:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(210, 105, 30, 0.3);
+}
+
+.btn-review:active {
+  transform: translateY(0);
+}
+
+.order-items-table table tbody td {
+  vertical-align: middle;
+}
+
+.order-items-table table tbody tr:last-child td {
+  padding-bottom: 12px;
+}

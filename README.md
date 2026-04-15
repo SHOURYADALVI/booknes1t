@@ -1,7 +1,7 @@
 # BookNest – Online Bookstore
 
 E-Commerce application built for VES Institute of Technology | E-Commerce Lab  
-**Stack:** React (Vite) · Node.js Serverless Functions · Razorpay · Vercel
+**Stack:** React (Vite) · Node.js Serverless Functions · JWT auth · Razorpay · Vercel
 
 ---
 
@@ -10,11 +10,17 @@ E-Commerce application built for VES Institute of Technology | E-Commerce Lab
 | Module | Where to find it |
 |--------|-----------------|
 | Order Management + Inventory | `/admin` → Order Management tab + Inventory tab |
+| Secure Admin Login | `/login` → JWT session, route protection, logout |
 | Online Payment System (Razorpay) | `/cart` → checkout flow |
 | ERP + CRM Concepts | `/admin` → Overview + CRM tabs |
 | Digital Marketing + Landing Pages | `/` (home) + `/subscriptions` |
 | Risk Assessment + Security | `/admin` → Risk & Security tab |
 | Cloud Deployment | This README — deployed on Vercel |
+| **NEW: Real-Time Order Management** | `/admin` → Order Management (all orders) + `/orders` (user orders) |
+| **NEW: Dual-Role System (Admin/Customer)** | Login with different roles → Different dashboards |
+| **NEW: Live Order Sync** | Place order as user → See instantly in admin dashboard |
+| **NEW: Order Status Notifications** | Admin updates status → User gets toast notification |
+| **NEW: Live CRM Analytics** | `/admin` → CRM tab (3 sub-tabs: Overview, Products, Timeline) |
 
 ---
 
@@ -23,7 +29,12 @@ E-Commerce application built for VES Institute of Technology | E-Commerce Lab
 ```
 booknest/
 ├── api/                         # Vercel serverless functions (Node.js)
+│   ├── _auth.js                 # Shared JWT + cookie helpers
 │   ├── create-order.js          # POST /api/create-order  — creates Razorpay order
+│   ├── auth/
+│   │   ├── login.js             # POST /api/auth/login — issues JWT session cookie
+│   │   ├── me.js                # GET /api/auth/me — restores active session
+│   │   └── logout.js           # POST /api/auth/logout — clears session cookie
 │   ├── verify-payment.js        # POST /api/verify-payment — verifies HMAC signature
 │   └── package.json             # razorpay npm dependency
 │
@@ -39,6 +50,7 @@ booknest/
 │   │       ├── BookDetailPage   # Single book view
 │   │       ├── CartPage         # Cart + Razorpay checkout
 │   │       ├── OrdersPage       # Order tracking
+│   │       ├── LoginPage        # Secure admin sign-in
 │   │       ├── SubscriptionsPage
 │   │       └── AdminPage        # Dashboard (ERP/CRM/Inventory/Security)
 │   │           └── admin/       # Overview, Orders, Inventory, CRM, Security tabs
@@ -51,7 +63,51 @@ booknest/
 
 ---
 
-## Local Development
+## NEW: Multi-Role Admin-User Real-Time System
+
+### What's New
+
+✅ **Separate logins for Admin and Customer**
+- Admin gets full dashboard access to `/admin`
+- Customers get order tracking at `/orders`
+- Different redirects after login based on role
+
+✅ **Live Order Sync (Real-Time)**
+- User places order → appears instantly in admin's order list
+- Admin updates order status → User sees change within 5 seconds
+- Toast notifications alert users of status changes
+
+✅ **Simultaneous Sessions**
+- Login as Admin and Customer in different tabs/browsers
+- Changes sync instantly across all sessions
+- No session conflicts
+
+✅ **Live CRM Analytics Dashboard**
+- **Overview Tab:** Total orders, revenue, average order value, orders by status
+- **Products Tab:** Top-selling books with quantity and revenue analysis
+- **Timeline Tab:** 7-day bar chart of order volume
+- Auto-updates every 10 seconds
+
+### Quick Test
+
+**Demo Credentials:**
+
+| Role | Email | Password |
+|------|-------|----------|
+| Admin | `admin@booknest.local` | `BookNest@2026` |
+| Customer | `reader@booknest.local` | `Reader@2026` |
+
+**Test Flow:**
+1. Open two browser windows side-by-side
+2. Login as Customer in Window 1 → `/orders`
+3. Login as Admin in Window 2 → `/admin` → Order Management
+4. Customer places order in Window 1
+5. Order appears instantly in Admin's list in Window 2
+6. Admin updates status → Customer sees notification in Window 1 (within 5 sec)
+
+**See also:** [TESTING_GUIDE.md](TESTING_GUIDE.md) and [API_DOCUMENTATION.md](API_DOCUMENTATION.md)
+
+---
 
 ### 1. Clone and install
 
@@ -73,6 +129,16 @@ Open `.env` and fill in your Razorpay **test** keys:
 RAZORPAY_KEY_ID=rzp_test_xxxxxxxxxxxx
 RAZORPAY_KEY_SECRET=xxxxxxxxxxxxxxxxxxxx
 VITE_RAZORPAY_KEY_ID=rzp_test_xxxxxxxxxxxx
+```
+
+Then add the admin auth values:
+
+```bash
+AUTH_ADMIN_EMAIL=admin@booknest.local
+AUTH_ADMIN_PASSWORD=BookNest@2026
+AUTH_USER_EMAIL=reader@booknest.local
+AUTH_USER_PASSWORD=Reader@2026
+JWT_SECRET=replace-with-a-long-random-string
 ```
 
 > Get keys from: https://dashboard.razorpay.com → Settings → API Keys → Generate Test Key
@@ -131,6 +197,11 @@ In Vercel project → Settings → Environment Variables, add:
 | `RAZORPAY_KEY_ID` | `rzp_test_xxx...` | Production + Preview + Development |
 | `RAZORPAY_KEY_SECRET` | `xxx...` | Production + Preview + Development |
 | `VITE_RAZORPAY_KEY_ID` | `rzp_test_xxx...` | Production + Preview + Development |
+| `AUTH_ADMIN_EMAIL` | `admin@booknest.local` | Production + Preview + Development |
+| `AUTH_ADMIN_PASSWORD` | `BookNest@2026` | Production + Preview + Development |
+| `AUTH_USER_EMAIL` | `reader@booknest.local` | Production + Preview + Development |
+| `AUTH_USER_PASSWORD` | `Reader@2026` | Production + Preview + Development |
+| `JWT_SECRET` | `long-random-string` | Production + Preview + Development |
 
 ### Step 4 — Deploy
 
@@ -188,13 +259,25 @@ Or use UPI test ID: `success@razorpay`
 3. **Book Detail** `/book/b001` — Full book page, add to cart
 4. **Cart + Payment** `/cart` — Enter name/email/phone → Pay with Razorpay test card → Order confirmed
 5. **My Orders** `/orders` — See all orders with status, expand for details
-6. **Subscriptions** `/subscriptions` — Subscription box plans
-7. **Admin Dashboard** `/admin`
+6. **Login** `/login` — Admin sign-in with JWT + protected session
+7. **Subscriptions** `/subscriptions` — Subscription box plans
+8. **Admin Dashboard** `/admin`
    - **Overview** — Revenue charts, genre sales, order pipeline
    - **Order Management** — Update order status (ERP workflow)
    - **Inventory** — Edit stock levels, low-stock alerts
    - **CRM** — Customer segmentation (VIP/Regular/New), LTV, newsletter opt-in rates
    - **Risk & Security** — Threat register, PCI DSS checklist, BCP summary
+
+### Admin Login Flow
+
+The app now uses a server-issued JWT session with role separation:
+
+1. `POST /api/auth/login` validates the selected role's credentials and signs a JWT on the server.
+2. The token is stored in an `HttpOnly` cookie so the browser cannot read it from JavaScript.
+3. `GET /api/auth/me` verifies the cookie and restores the session on page refresh.
+4. `POST /api/auth/logout` clears the session cookie.
+
+The admin dashboard is locked to `role: admin`; customer sessions can still sign in, but they are routed away from `/admin`. The login endpoint also rate-limits repeated failures per IP and keeps the session short-lived by default.
 
 ---
 

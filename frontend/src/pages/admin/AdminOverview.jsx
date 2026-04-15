@@ -1,5 +1,5 @@
-import { MONTHLY_REVENUE, GENRE_SALES, INITIAL_ORDERS } from "../../data/mockData";
-import { useCart } from "../../context/CartContext";
+import { MONTHLY_REVENUE, GENRE_SALES, INITIAL_ORDERS } from "../../data/mockData.js";
+import { useCart } from "../../context/CartContext.jsx";
 import { AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { TrendingUp, ShoppingBag, Users, DollarSign } from "lucide-react";
 

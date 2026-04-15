@@ -1,0 +1,389 @@
+.analytics-reports {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Tabs */
+.report-tabs {
+  display: flex;
+  gap: 8px;
+  border-bottom: 2px solid var(--border);
+  padding-bottom: 0;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.report-tab {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  background: none;
+  border: none;
+  border-bottom: 3px solid transparent;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--muted);
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.report-tab:hover {
+  color: var(--ink);
+  background: var(--cream-dark);
+}
+
+.report-tab.active {
+  color: #667eea;
+  border-bottom-color: #667eea;
+}
+
+/* Content */
+.report-content {
+  animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.report-section {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.report-section h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.report-section h4 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Segment Grid */
+.segment-grid,
+.quality-tiers,
+.kpi-grid,
+.satisfaction-grid,
+.loyalty-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px;
+}
+
+.segment-card,
+.quality-card,
+.kpi-card,
+.satisfaction-card,
+.loyalty-card {
+  background: white;
+  border: 1px solid #f0f0f0;
+  border-radius: 10px;
+  padding: 16px;
+  text-align: center;
+  transition: all 0.2s;
+}
+
+.segment-card:hover,
+.quality-card:hover,
+.kpi-card:hover,
+.satisfaction-card:hover,
+.loyalty-card:hover {
+  border-color: #ddd;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.segment-emoji {
+  font-size: 32px;
+  margin-bottom: 8px;
+}
+
+.segment-name,
+.quality-label,
+.satisfaction-metric,
+.loyalty-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 8px;
+}
+
+.segment-count,
+.quality-count,
+.kpi-value,
+.loyalty-value {
+  font-size: 24px;
+  font-weight: 700;
+  color: #667eea;
+  margin-bottom: 4px;
+}
+
+.segment-revenue,
+.quality-detail,
+.satisfaction-card .detail,
+.loyalty-card .detail {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.rating-value {
+  font-size: 18px;
+  font-weight: 700;
+  color: #ffc107;
+  margin: 8px 0;
+}
+
+.star {
+  margin-right: 2px;
+}
+
+.nps-value,
+.percentage {
+  font-size: 28px;
+  font-weight: 700;
+  color: #2ecc71;
+  margin: 8px 0;
+}
+
+.trend {
+  font-size: 12px;
+  font-weight: 600;
+  margin-top: 8px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  background: #f0f0f0;
+  color: var(--muted);
+}
+
+.trend.upward {
+  background: #d4edda;
+  color: #2e7d32;
+}
+
+.trend.downward {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+/* Tables */
+.data-table,
+.quality-card {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 12px;
+}
+
+.data-table {
+  background: white;
+}
+
+.data-table thead {
+  background: #f9f9f9;
+  border-bottom: 2px solid #f0f0f0;
+}
+
+.data-table th {
+  padding: 12px;
+  text-align: left;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.data-table td {
+  padding: 12px;
+  border-bottom: 1px solid #f0f0f0;
+  font-size: 13px;
+  color: var(--ink);
+}
+
+.data-table tbody tr:hover {
+  background: #fafafa;
+}
+
+.product-name {
+  font-weight: 600;
+}
+
+.rating {
+  color: #ffc107;
+  font-weight: 600;
+}
+
+/* Quality Tiers */
+.quality-card {
+  position: relative;
+  padding: 20px;
+  border-radius: 10px;
+  color: white;
+  border: none;
+}
+
+.quality-card.premium {
+  background: linear-gradient(135deg, #ffd700, #ffed4e);
+  color: #856404;
+}
+
+.quality-card.standard {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+}
+
+.quality-card.improving {
+  background: linear-gradient(135deg, #ff6b6b, #ee5a6f);
+}
+
+.quality-count {
+  font-size: 32px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+/* Distribution */
+.rating-distribution {
+  background: white;
+  border: 1px solid #f0f0f0;
+  border-radius: 10px;
+  padding: 16px;
+  margin-top: 16px;
+}
+
+.distribution-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.distribution-row {
+  display: grid;
+  grid-template-columns: 50px 1fr 40px;
+  gap: 12px;
+  align-items: center;
+}
+
+.star-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.bar-container {
+  background: #f0f0f0;
+  border-radius: 4px;
+  height: 24px;
+  overflow: hidden;
+}
+
+.bar {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+.bar.star-5 {
+  background: linear-gradient(90deg, #ffc107, #ffed4e);
+}
+
+.bar.star-4 {
+  background: linear-gradient(90deg, #2ecc71, #27ae60);
+}
+
+.bar.star-3 {
+  background: linear-gradient(90deg, #3498db, #2980b9);
+}
+
+.bar.star-2 {
+  background: linear-gradient(90deg, #f39c12, #e67e22);
+}
+
+.bar.star-1 {
+  background: linear-gradient(90deg, #e74c3c, #c0392b);
+}
+
+.count {
+  text-align: right;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+  min-width: 40px;
+}
+
+/* Segment Details */
+.segment-details {
+  background: white;
+  border: 1px solid #f0f0f0;
+  border-radius: 10px;
+  padding: 16px;
+  margin-top: 16px;
+}
+
+.top-products {
+  background: white;
+  border: 1px solid #f0f0f0;
+  border-radius: 10px;
+  padding: 16px;
+  margin-top: 16px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .report-tabs {
+    gap: 4px;
+  }
+
+  .report-tab {
+    padding: 10px 12px;
+    font-size: 12px;
+  }
+
+  .segment-grid,
+  .quality-tiers,
+  .kpi-grid,
+  .satisfaction-grid,
+  .loyalty-grid {
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  }
+
+  .segment-card,
+  .quality-card,
+  .kpi-card,
+  .satisfaction-card,
+  .loyalty-card {
+    padding: 12px;
+  }
+
+  .distribution-row {
+    grid-template-columns: 40px 1fr 30px;
+  }
+
+  .data-table {
+    font-size: 12px;
+  }
+
+  .data-table th,
+  .data-table td {
+    padding: 8px;
+  }
+}

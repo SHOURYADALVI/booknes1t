@@ -1,21 +1,25 @@
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import { BOOKS } from "../data/mockData";
 import { useCart } from "../context/CartContext";
 import { useToast } from "../hooks/useToast";
+import { useReviews } from "../hooks/useReviews";
 import Toast from "../components/Toast";
+import ReviewsDisplay from "../components/ReviewsDisplay";
 import { Star, ShoppingCart, ArrowLeft, Package, Zap } from "lucide-react";
 import "./BookDetailPage.css";
 
 export default function BookDetailPage() {
   const { id } = useParams();
+  const navigate = useNavigate();
   const book = BOOKS.find(b => b.id === id);
   const { addItem, items } = useCart();
   const { toast, showToast } = useToast();
+  const { reviews, averageRating, fetchReviews, totalReviews: reviewCount } = useReviews();
 
   if (!book) return (
     <div className="container" style={{ padding: "80px 24px", textAlign: "center" }}>
       <h2>Book not found</h2>
-      <Link to="/shop" className="btn btn-primary" style={{ marginTop: 16 }}>Back to Shop</Link>
+      <button onClick={() => navigate(-1)} className="btn btn-primary" style={{ marginTop: 16 }}>Go Back</button>
     </div>
   );
 
@@ -23,12 +27,18 @@ export default function BookDetailPage() {
   const discount = Math.round((1 - book.price / book.mrp) * 100);
   const related = BOOKS.filter(b => b.genre === book.genre && b.id !== book.id).slice(0, 3);
 
+  const handleBack = () => {
+    navigate(-1);
+  };
+
   return (
     <>
       <Toast toast={toast} />
       <div className="book-detail-page">
         <div className="container">
-          <Link to="/shop" className="back-link"><ArrowLeft size={16} /> Back to Shop</Link>
+          <button onClick={handleBack} className="back-link">
+            <ArrowLeft size={16} /> Go Back
+          </button>
 
           <div className="book-detail-grid">
             <div className="book-detail-cover">
@@ -111,6 +121,15 @@ export default function BookDetailPage() {
               </div>
             </div>
           )}
+
+          <ReviewsDisplay
+            bookId={id}
+            bookTitle={book.title}
+            reviews={reviews}
+            averageRating={averageRating}
+            totalReviews={reviewCount}
+            onLoadReviews={fetchReviews}
+          />
         </div>
       </div>
     </>
